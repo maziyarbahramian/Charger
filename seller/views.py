@@ -8,13 +8,11 @@ from seller.serializers import (
     SellerSerializer,
     AuthTokenSerializer,
 )
-from rest_framework.permissions import IsAuthenticated
 
 
 class CreateSellerView(generics.CreateAPIView):
     """Create a new seller in the system."""
     serializer_class = SellerSerializer
-    permission_classes = [IsAuthenticated]
 
 
 class CreateTokenView(ObtainAuthToken):
