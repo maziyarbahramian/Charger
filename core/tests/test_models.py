@@ -72,10 +72,29 @@ class ModelTests(TestCase):
         self.assertTrue(credit_exist)
 
     def test_create_phone_number(self):
+        """Test creating a phone number successfull."""
         number = '+989123456789'
         charge = Decimal('1000')
 
-        ph = models.PhoneNumber(phone_number=number, charge=charge)
-        
+        ph = models.PhoneNumber.objects.create(
+            phone_number=number, charge=charge)
+
         self.assertEqual(ph.phone_number, number)
         self.assertEqual(ph.charge, charge)
+
+    def test_create_charge_request(self):
+        """Test creating a charge request successfull."""
+        seller = create_seller()
+        phone_number = models.PhoneNumber.objects.create(
+            phone_number='+989112345678'
+        )
+        amount = Decimal('2000')
+        request = models.ChargeRequest.objects.create(
+            seller=seller,
+            phone_number=phone_number,
+            requested_credit_amount=amount
+        )
+
+        self.assertEqual(request.seller, seller)
+        self.assertEqual(request.phone_number, phone_number)
+        self.assertEqual(request.requested_credit_amount, amount)

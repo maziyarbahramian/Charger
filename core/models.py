@@ -51,7 +51,7 @@ class Seller(AbstractBaseUser, PermissionsMixin):
 
 
 class CreditRequest(models.Model):
-
+    """model for credit requests."""
     STATUS_CHOICES = [
         ('Pending', 'Pending'),
         ('Success', 'Success'),
@@ -70,11 +70,30 @@ class CreditRequest(models.Model):
 
 
 class PhoneNumber(models.Model):
+    """model for phone numbers."""
     phone_number = models.CharField(max_length=20)
-    charge = models.DecimalField(max_digits=6, 
+    charge = models.DecimalField(max_digits=6,
                                  decimal_places=2,
                                  null=True,
                                  blank=True,
                                  default=0)
 
 
+class ChargeRequest(models.Model):
+    """model for charge requests."""
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Success', 'Success'),
+        ('Failed', 'Failed')
+    ]
+
+    seller = models.ForeignKey('seller', on_delete=models.CASCADE)
+    phone_number = models.ForeignKey('PhoneNumber', on_delete=models.CASCADE)
+    requested_credit_amount = models.DecimalField(
+        max_digits=6, decimal_places=2)
+    request_time = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )
