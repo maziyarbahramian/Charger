@@ -48,3 +48,22 @@ class Seller(AbstractBaseUser, PermissionsMixin):
     objects = SellerManager()
 
     USERNAME_FIELD = 'email'
+
+
+class CreditRequest(models.Model):
+
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Success', 'Success'),
+        ('Failed', 'Failed')
+    ]
+
+    seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
+    requested_credit_amount = models.DecimalField(
+        max_digits=6, decimal_places=2)
+    request_time = models.DateTimeField(auto_now_add=True)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default='Pending'
+    )

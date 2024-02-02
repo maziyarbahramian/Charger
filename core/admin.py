@@ -44,3 +44,4 @@ class SellerAdmin(UserAdmin):
 
 
 admin.site.register(models.Seller, SellerAdmin)
+admin.site.register(models.CreditRequest)

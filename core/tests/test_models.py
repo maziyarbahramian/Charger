@@ -3,6 +3,8 @@ Tests for models.
 """
 from django.test import TestCase
 from django.contrib.auth import get_user_model
+from core import models
+from decimal import Decimal
 
 
 def create_seller(email='user@example.com', password='testpass123'):
@@ -53,3 +55,18 @@ class ModelTests(TestCase):
 
         self.assertTrue(seller.is_superuser)
         self.assertTrue(seller.is_staff)
+
+    def test_create_credit_request(self):
+        """Test creating a credit request successfull."""
+        seller = create_seller()
+        credit_request = models.CreditRequest.objects.create(
+            seller=seller,
+            requested_credit_amount=Decimal('10.05')
+        )
+
+        credit_exist = models.CreditRequest.objects.get(
+            seller=seller,
+            requested_credit_amount=Decimal('10.05')
+        )
+
+        self.assertTrue(credit_exist)
