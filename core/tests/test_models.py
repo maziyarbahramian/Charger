@@ -70,3 +70,12 @@ class ModelTests(TestCase):
         )
 
         self.assertTrue(credit_exist)
+
+    def test_create_phone_number(self):
+        number = '+989123456789'
+        charge = Decimal('1000')
+
+        ph = models.PhoneNumber(phone_number=number, charge=charge)
+        
+        self.assertEqual(ph.phone_number, number)
+        self.assertEqual(ph.charge, charge)
