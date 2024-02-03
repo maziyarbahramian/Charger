@@ -49,6 +49,11 @@ class Seller(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
 
+    class InsufficientCreditError(Exception):
+        def __init__(self, message="Seller credit is insufficient."):
+            self.message = message
+            super().__init__(self.message)
+
 
 class CreditRequest(models.Model):
     """model for credit requests."""
@@ -95,11 +100,6 @@ class ChargeRequest(models.Model):
         choices=Status.choices,
         default=Status.PENDING
     )
-
-    class InsufficientCreditError(Exception):
-        def __init__(self, message="Seller credit is insufficient."):
-            self.message = message
-            super().__init__(self.message)
 
 
 class Transaction(models.Model):
