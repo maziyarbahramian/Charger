@@ -61,12 +61,12 @@ class ModelTests(TestCase):
         seller = create_seller()
         credit_request = models.CreditRequest.objects.create(
             seller=seller,
-            requested_credit_amount=Decimal('10.05')
+            amount=Decimal('10.05')
         )
 
         credit_exist = models.CreditRequest.objects.get(
             seller=seller,
-            requested_credit_amount=Decimal('10.05')
+            amount=Decimal('10.05')
         )
 
         self.assertTrue(credit_exist)
@@ -76,28 +76,28 @@ class ModelTests(TestCase):
         number = '+989123456789'
         charge = Decimal('1000')
 
-        ph = models.PhoneNumber.objects.create(
-            phone_number=number, charge=charge)
+        phone_number = models.PhoneNumber.objects.create(
+            number=number, charge=charge)
 
-        self.assertEqual(ph.phone_number, number)
-        self.assertEqual(ph.charge, charge)
+        self.assertEqual(phone_number.number, number)
+        self.assertEqual(phone_number.charge, charge)
 
     def test_create_charge_request(self):
         """Test creating a charge request successfull."""
         seller = create_seller()
         phone_number = models.PhoneNumber.objects.create(
-            phone_number='+989112345678'
+            number='+989112345678'
         )
         amount = Decimal('2000')
         request = models.ChargeRequest.objects.create(
             seller=seller,
             phone_number=phone_number,
-            requested_credit_amount=amount
+            amount=amount
         )
 
         self.assertEqual(request.seller, seller)
         self.assertEqual(request.phone_number, phone_number)
-        self.assertEqual(request.requested_credit_amount, amount)
+        self.assertEqual(request.amount, amount)
 
     def test_create_transaction(self):
         """Test creating a transation successfull."""
