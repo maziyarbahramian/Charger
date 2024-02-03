@@ -99,6 +99,10 @@ class ChargeRequest(models.Model):
 
 class Transaction(models.Model):
     """model for all of deposit and withdraw transactions."""
+    class Type(models.TextChoices):
+        WITHDRAW = ('Withdraw', 'Withdraw')
+        DEPOSIT = ('Deposit', 'Deposit')
+
     seller = models.ForeignKey('seller', on_delete=models.CASCADE)
     amount = models.DecimalField(
         max_digits=10, decimal_places=2)
@@ -106,3 +110,8 @@ class Transaction(models.Model):
         max_digits=10, decimal_places=2)
     credit_after_transaction = models.DecimalField(
         max_digits=10, decimal_places=2)
+    type = models.CharField(
+        max_length=10,
+        choices=Type.choices
+    )
+    detail = models.TextField()

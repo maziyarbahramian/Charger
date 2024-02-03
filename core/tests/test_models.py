@@ -107,7 +107,9 @@ class ModelTests(TestCase):
             seller=seller,
             amount=transaction_amount,
             credit_before_transaction=seller.credit,
-            credit_after_transaction=seller.credit+transaction_amount
+            credit_after_transaction=seller.credit+transaction_amount,
+            type=models.Transaction.Type.DEPOSIT,
+            detail='just a test.'
         )
 
         self.assertEqual(transaction.seller, seller)
