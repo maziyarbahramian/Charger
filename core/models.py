@@ -37,7 +37,7 @@ class Seller(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(max_length=255, unique=True)
     name = models.CharField(max_length=255)
     about = models.TextField()
-    credit = models.DecimalField(max_digits=6,
+    credit = models.DecimalField(max_digits=10,
                                  decimal_places=2,
                                  null=True,
                                  blank=True,
@@ -59,7 +59,7 @@ class CreditRequest(models.Model):
 
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
     requested_credit_amount = models.DecimalField(
-        max_digits=6, decimal_places=2)
+        max_digits=10, decimal_places=2)
     request_time = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=10,
@@ -71,7 +71,7 @@ class CreditRequest(models.Model):
 class PhoneNumber(models.Model):
     """model for phone numbers."""
     phone_number = models.CharField(max_length=20)
-    charge = models.DecimalField(max_digits=6,
+    charge = models.DecimalField(max_digits=10,
                                  decimal_places=2,
                                  null=True,
                                  blank=True,
@@ -88,10 +88,21 @@ class ChargeRequest(models.Model):
     seller = models.ForeignKey('seller', on_delete=models.CASCADE)
     phone_number = models.ForeignKey('PhoneNumber', on_delete=models.CASCADE)
     requested_credit_amount = models.DecimalField(
-        max_digits=6, decimal_places=2)
+        max_digits=10, decimal_places=2)
     request_time = models.DateTimeField(auto_now_add=True)
     status = models.CharField(
         max_length=10,
         choices=Status.choices,
         default=Status.PENDING
     )
+
+
+class Transaction(models.Model):
+    """model for all of deposit and withdraw transactions."""
+    seller = models.ForeignKey('seller', on_delete=models.CASCADE)
+    amount = models.DecimalField(
+        max_digits=10, decimal_places=2)
+    credit_before_transaction = models.DecimalField(
+        max_digits=10, decimal_places=2)
+    credit_after_transaction = models.DecimalField(
+        max_digits=10, decimal_places=2)

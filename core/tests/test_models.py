@@ -98,3 +98,17 @@ class ModelTests(TestCase):
         self.assertEqual(request.seller, seller)
         self.assertEqual(request.phone_number, phone_number)
         self.assertEqual(request.requested_credit_amount, amount)
+
+    def test_create_transaction(self):
+        """Test creating a transation successfull."""
+        seller = create_seller()
+        transaction_amount = Decimal('10000')
+        transaction = models.Transaction.objects.create(
+            seller=seller,
+            amount=transaction_amount,
+            credit_before_transaction=seller.credit,
+            credit_after_transaction=seller.credit+transaction_amount
+        )
+
+        self.assertEqual(transaction.seller, seller)
+        self.assertEqual(transaction.amount, transaction_amount)
