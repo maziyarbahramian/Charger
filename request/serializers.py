@@ -43,3 +43,9 @@ class AcceptCreditRequestSerializer(serializers.ModelSerializer):
                   'credit_after_transaction', 'type', 'detail']
         read_only_fields = ['id', 'seller', 'amount', 'credit_before_transaction',
                             'credit_after_transaction', 'type', 'detail']
+
+
+class CreditRequestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CreditRequest
+        fields = '__all__'

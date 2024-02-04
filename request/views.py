@@ -1,4 +1,4 @@
-from rest_framework import status, generics
+from rest_framework import status, generics, mixins, viewsets
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
@@ -48,3 +48,18 @@ class AcceptCreditRequestViewSet(generics.GenericAPIView):
                 return Response(data=response, status=status.HTTP_409_CONFLICT)
             output_serializer = self.serializer_class(transaction)
             return Response(output_serializer.data)
+
+
+class CreditRequestViewSet(mixins.RetrieveModelMixin,
+                           mixins.ListModelMixin,
+                           viewsets.GenericViewSet):
+    serializer_class = serializers.CreditRequestSerializer
+    queryset = CreditRequest.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        if not self.request.user.is_staff:
+            return CreditRequest.objects.filter(seller=self.request.user)
+        else:
+            return self.queryset
