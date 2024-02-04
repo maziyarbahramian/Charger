@@ -71,6 +71,11 @@ class CreditRequest(models.Model):
         choices=Status.choices,
         default=Status.PENDING
     )
+    
+    class AlreadyProcessedError(Exception):
+        def __init__(self, message="Request already processed to Success or Failed state."):
+            self.message = message
+            super().__init__(self.message)
 
 
 class PhoneNumber(models.Model):

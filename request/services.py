@@ -55,8 +55,11 @@ class RequestService:
     def accept_credit_request(self, request_id):
         """accept credit request and add requested amount to seller credit"""
         with transaction.atomic():
-
             request = CreditRequest.objects.get(id=request_id)
+            
+            if request.status != CreditRequest.Status.PENDING:
+                raise CreditRequest.AlreadyProcessedError
+            
             request.status = CreditRequest.Status.SUCCESS
             request.save()
             seller = Seller.objects.get_queryset() \
