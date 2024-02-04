@@ -1,9 +1,12 @@
 from rest_framework import status, generics
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.authentication import TokenAuthentication
 from request import serializers
 from request.services import RequestService
+from core.models import (
+    CreditRequest
+)
 
 
 class CreateCreditRequestViewSet(generics.GenericAPIView):
@@ -23,3 +26,25 @@ class CreateCreditRequestViewSet(generics.GenericAPIView):
                 seller_id, amount)
             output_serializer = self.serializer_class(credit_request)
             return Response(data=output_serializer.data, status=status.HTTP_201_CREATED)
+
+
+class AcceptCreditRequestViewSet(generics.GenericAPIView):
+    serializer_class = serializers.AcceptCreditRequestSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        service = RequestService()
+        if serializer.is_valid(raise_exception=True):
+            request_id = serializer.validated_data['request_id']
+            try:
+                transaction = service.accept_credit_request(request_id)
+            except CreditRequest.AlreadyProcessedError:
+                response = {
+                    'error': 'Process already completed.',
+                    'message': 'The requested process has already been done. Subsequent requests are not allowed.'
+                }
+                return Response(data=response, status=status.HTTP_409_CONFLICT)
+            output_serializer = self.serializer_class(transaction)
+            return Response(output_serializer.data)
