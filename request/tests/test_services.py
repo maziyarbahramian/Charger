@@ -28,7 +28,7 @@ class ServiceTest(TransactionTestCase):
     def test_create_credit_request(self):
         """test create a credit request."""
         request_amount = Decimal('50.00')
-        request = self.service.save_credit_request(
+        request = self.service.create_credit_request(
             seller_id=self.seller.id,
             amount=request_amount
         )
@@ -39,7 +39,7 @@ class ServiceTest(TransactionTestCase):
     def test_accept_credit_request(self):
         """Test accept a credit request."""
         request_amount = Decimal('50.00')
-        request = self.service.save_credit_request(
+        request = self.service.create_credit_request(
             seller_id=self.seller.id,
             amount=request_amount
         )
@@ -56,7 +56,7 @@ class ServiceTest(TransactionTestCase):
     def test_reject_credit_request(self):
         """Test reject a credit request."""
         request_amount = Decimal('50.00')
-        request = self.service.save_credit_request(
+        request = self.service.create_credit_request(
             seller_id=self.seller.id,
             amount=request_amount
         )

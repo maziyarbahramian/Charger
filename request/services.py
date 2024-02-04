@@ -22,7 +22,7 @@ class RequestService:
             cls._instance = super(RequestService, cls).__new__(cls)
         return cls._instance
 
-    def save_credit_request(self, seller_id, amount):
+    def create_credit_request(self, seller_id, amount):
         """save seller's credit request"""
         request = CreditRequest.objects.create(
             seller_id=seller_id,
