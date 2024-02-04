@@ -5,7 +5,9 @@ from rest_framework.authentication import TokenAuthentication
 from request import serializers
 from request.services import RequestService
 from core.models import (
-    CreditRequest
+    CreditRequest,
+    PhoneNumber,
+    Seller
 )
 
 
@@ -63,3 +65,30 @@ class CreditRequestViewSet(mixins.RetrieveModelMixin,
             return CreditRequest.objects.filter(seller=self.request.user)
         else:
             return self.queryset
+
+
+class ChargePhoneNumberViewSet(generics.GenericAPIView):
+    serializer_class = serializers.PhoneNumberSerialzier
+    permission_classes = [IsAuthenticated]
+    queryset = PhoneNumber.objects.all()
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        service = RequestService()
+        if serializer.is_valid(raise_exception=True):
+            number = serializer.validated_data['number']
+            amount = serializer.validated_data['amount']
+            try:
+                phone_number, _ = service.charge_phone_number(
+                    request.user.id, number, amount
+                )
+                output_seralizer = self.serializer_class(phone_number)
+                return Response(data=output_seralizer.data, status=status.HTTP_200_OK)
+
+            except Seller.InsufficientCreditError:
+                response = {
+                    'error': 'Insufficient credit.',
+                    'message': 'The requested process requires more credit than available.'
+                }
+                return Response(data=response, status=status.HTTP_402_PAYMENT_REQUIRED)

@@ -13,5 +13,7 @@ urlpatterns = [
     path('accept-credit-request',
          views.AcceptCreditRequestViewSet.as_view(),
          name='accept-credit-request'),
-
+    path('charge-phone-number',
+         views.ChargePhoneNumberViewSet.as_view(),
+         name='charge-phone-number'),
 ]

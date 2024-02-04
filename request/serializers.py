@@ -6,7 +6,8 @@ from django.core.validators import MinValueValidator
 from core.models import (
     CreditRequest,
     Seller,
-    Transaction
+    Transaction,
+    PhoneNumber
 )
 from seller.serializers import SellerSerializer
 
@@ -49,3 +50,14 @@ class CreditRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditRequest
         fields = '__all__'
+
+
+class PhoneNumberSerialzier(serializers.ModelSerializer):
+    amount = serializers.DecimalField(max_digits=10,
+                                      decimal_places=2,
+                                      write_only=True)
+
+    class Meta:
+        model = PhoneNumber
+        fields = ['id', 'number', 'charge', 'amount']
+        read_only_fields = ['id', 'charge']
