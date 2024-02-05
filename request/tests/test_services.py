@@ -36,8 +36,8 @@ class ServiceTest(TransactionTestCase):
         self.assertEqual(request.amount, request_amount)
         self.assertEqual(request.status, CreditRequest.Status.PENDING)
 
-    def test_accept_credit_request(self):
-        """Test accept a credit request."""
+    def test_accept_credit_request_success(self):
+        """Test accept a credit request successfull."""
         request_amount = Decimal('50.00')
         request = self.service.create_credit_request(
             seller_id=self.seller.id,
@@ -52,6 +52,17 @@ class ServiceTest(TransactionTestCase):
                          self.seller.credit+request_amount)
         self.seller.refresh_from_db()
         self.assertEqual(self.seller.credit, Decimal('150.00'))
+
+    def test_accept_credit_request_failed(self):
+        """Test accept a already processed credit request failed."""
+        request = CreditRequest.objects.create(
+            seller=self.seller,
+            amount=Decimal('50.00'),
+            status=CreditRequest.Status.SUCCESS,
+        )
+
+        with self.assertRaises(CreditRequest.AlreadyProcessedError):
+            self.service.accept_credit_request(request.id)
 
     def test_reject_credit_request(self):
         """Test reject a credit request."""
