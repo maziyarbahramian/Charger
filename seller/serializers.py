@@ -14,7 +14,7 @@ class SellerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = get_user_model()
-        fields = ['email', 'password', 'name', 'about']
+        fields = ['id', 'email', 'password', 'name', 'about']
         extra_kwargs = {
             'password': {'write_only': True, 'min_length': 5},
             'about': {'required': False}
@@ -29,7 +29,6 @@ class SellerDetailSerializer(serializers.ModelSerializer):
     """Serializer for show detail of seller."""
     class Meta:
         model = get_user_model()
-        # fields = '__all__'
         exclude = ['user_permissions', 'groups', 'password']
 
 

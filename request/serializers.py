@@ -68,6 +68,8 @@ class ChargePhoneNumberSerializer(serializers.ModelSerializer):
 
 
 class CreditRequestSerializer(serializers.ModelSerializer):
+    seller = SellerSerializer()
+
     class Meta:
         model = CreditRequest
         fields = '__all__'
