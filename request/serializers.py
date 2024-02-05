@@ -45,6 +45,24 @@ class AcceptCreditRequestSerializer(serializers.ModelSerializer):
                             'credit_after_transaction', 'type', 'detail']
 
 
+class ChargePhoneNumberSerializer(serializers.ModelSerializer):
+    phone_number = serializers.CharField(max_length=20, write_only=True)
+
+    class Meta:
+        model = Transaction
+        fields = '__all__'
+        read_only_fields = ['id', 'seller', 'credit_before_transaction',
+                            'credit_after_transaction', 'type', 'detail']
+        extra_kwargs = {
+            'amount': {
+                'validators': [
+                    MinValueValidator(
+                        limit_value=0.01)
+                ]
+            },
+        }
+
+
 class CreditRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditRequest
