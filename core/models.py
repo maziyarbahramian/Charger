@@ -71,21 +71,11 @@ class CreditRequest(models.Model):
         choices=Status.choices,
         default=Status.PENDING
     )
-    
+
     class AlreadyProcessedError(Exception):
         def __init__(self, message="Request already processed to Success or Failed state."):
             self.message = message
             super().__init__(self.message)
-
-
-class PhoneNumber(models.Model):
-    """model for phone numbers."""
-    number = models.CharField(max_length=20)
-    charge = models.DecimalField(max_digits=10,
-                                 decimal_places=2,
-                                 null=True,
-                                 blank=True,
-                                 default=0)
 
 
 class ChargeRequest(models.Model):
@@ -96,7 +86,7 @@ class ChargeRequest(models.Model):
         FAILED = ('Failed', 'Failed')
 
     seller = models.ForeignKey('seller', on_delete=models.CASCADE)
-    phone_number = models.ForeignKey('PhoneNumber', on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=20)
     amount = models.DecimalField(
         max_digits=10, decimal_places=2)
     request_time = models.DateTimeField(auto_now_add=True)

@@ -8,7 +8,6 @@ from django.db import transaction
 from decimal import Decimal
 from core.models import (
     CreditRequest,
-    PhoneNumber,
     ChargeRequest,
     Seller,
     Transaction
@@ -82,32 +81,25 @@ class ServiceTest(TransactionTestCase):
         """Test charge a phone number."""
         amount = Decimal('15.00')
         number = '+989114412191'
-        phone_number = PhoneNumber.objects.create(
-            number=number,
-            charge=Decimal('5.00')
-        )
-        _, transaction = self.service.charge_phone_number(
+
+        transaction = self.service.charge_phone_number(
             seller_id=self.seller.id,
-            number=number,
+            phone_number=number,
             amount=amount
         )
 
         self.seller.refresh_from_db()
-        phone_number.refresh_from_db()
         self.assertEqual(transaction.amount, -amount)
         self.assertEqual(self.seller.credit, Decimal('85.00'))
-        self.assertEqual(phone_number.charge, Decimal('20.00'))
 
     def test_charge_phone_number_failed(self):
         """Test charge a phone number failed because of insufficient credit"""
-        phone = PhoneNumber.objects.create(
-            number='+989114412191',
-            charge=Decimal('5.00')
-        )
+        phone_number = '+989114412191'
+
         with self.assertRaises(Seller.InsufficientCreditError):
             self.service.charge_phone_number(
                 seller_id=self.seller.id,
-                number=phone.number,
+                phone_number=phone_number,
                 amount=Decimal('150.00')
             )
 

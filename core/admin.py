@@ -45,5 +45,4 @@ class SellerAdmin(UserAdmin):
 
 admin.site.register(models.Seller, SellerAdmin)
 admin.site.register(models.CreditRequest)
-admin.site.register(models.PhoneNumber)
 admin.site.register(models.ChargeRequest)

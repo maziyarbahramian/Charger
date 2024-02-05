@@ -3,7 +3,6 @@ from django.db import transaction
 from core.models import (
     Seller,
     CreditRequest,
-    PhoneNumber,
     ChargeRequest,
     Transaction
 )
@@ -56,10 +55,10 @@ class RequestService:
         """accept credit request and add requested amount to seller credit"""
         with transaction.atomic():
             request = CreditRequest.objects.get(id=request_id)
-            
+
             if request.status != CreditRequest.Status.PENDING:
                 raise CreditRequest.AlreadyProcessedError
-            
+
             request.status = CreditRequest.Status.SUCCESS
             request.save()
             seller = Seller.objects.get_queryset() \
@@ -80,7 +79,7 @@ class RequestService:
             request.save()
             return request
 
-    def charge_phone_number(self, seller_id, number, amount):
+    def charge_phone_number(self, seller_id, phone_number, amount):
         """Charge the specified phone number."""
         with transaction.atomic():
             seller = Seller.objects.get_queryset() \
@@ -88,9 +87,6 @@ class RequestService:
 
             if seller.credit < amount:
                 raise Seller.InsufficientCreditError
-
-            phone_number = PhoneNumber.objects.get_queryset() \
-                .filter(number=number).select_for_update(nowait=True).get()
 
             request = ChargeRequest.objects.create(
                 seller=seller,
@@ -100,7 +96,5 @@ class RequestService:
             transaction_obj = self.ـwithdraw(seller, request)
             seller.credit -= amount
             seller.save()
-            phone_number.charge += amount
-            phone_number.save()
 
-            return phone_number, transaction_obj
+            return transaction_obj
