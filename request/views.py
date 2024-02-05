@@ -49,7 +49,29 @@ class AcceptCreditRequestViewSet(generics.GenericAPIView):
                 }
                 return Response(data=response, status=status.HTTP_409_CONFLICT)
             output_serializer = self.serializer_class(transaction)
-            return Response(output_serializer.data)
+            return Response(output_serializer.data, status=status.HTTP_200_OK)
+
+
+class RejectCreditRequestViewSet(generics.GenericAPIView):
+    serializer_class = serializers.RejectCreditRequestSerializer
+    permission_classes = [IsAuthenticated, IsAdminUser]
+    authentication_classes = [TokenAuthentication]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        service = RequestService()
+        if serializer.is_valid(raise_exception=True):
+            request_id = serializer.validated_data['request_id']
+            try:
+                credit_request = service.reject_credit_request(request_id)
+            except CreditRequest.AlreadyProcessedError:
+                response = {
+                    'error': 'Process already completed.',
+                    'message': 'The requested process has already been done. Subsequent requests are not allowed.'
+                }
+                return Response(data=response, status=status.HTTP_409_CONFLICT)
+            output_serializer = self.serializer_class(credit_request)
+            return Response(output_serializer.data, status=status.HTTP_200_OK)
 
 
 class CreditRequestViewSet(mixins.RetrieveModelMixin,

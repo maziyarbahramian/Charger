@@ -36,6 +36,19 @@ class AcceptCreditRequestSerializer(serializers.ModelSerializer):
                             'credit_after_transaction', 'type', 'detail']
 
 
+class RejectCreditRequestSerializer(serializers.ModelSerializer):
+    request_id = serializers.PrimaryKeyRelatedField(
+        queryset=CreditRequest.objects.values_list('id', flat=True).all(),
+        write_only=True
+    )
+    seller = SellerSerializer(required=False, read_only=True)
+
+    class Meta:
+        model = CreditRequest
+        fields = '__all__'
+        read_only_fields = ['seller', 'amount', 'request_time', 'status']
+
+
 class ChargePhoneNumberSerializer(serializers.ModelSerializer):
     phone_number = serializers.CharField(max_length=20, write_only=True)
 

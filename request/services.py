@@ -75,6 +75,10 @@ class RequestService:
         with transaction.atomic():
             request = CreditRequest.objects.get_queryset() \
                 .filter(id=request_id).select_for_update(nowait=True).get()
+
+            if request.status != CreditRequest.Status.PENDING:
+                raise CreditRequest.AlreadyProcessedError
+
             request.status = CreditRequest.Status.REJECTED
             request.save()
             return request
