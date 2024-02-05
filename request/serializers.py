@@ -53,9 +53,11 @@ class CreditRequestSerializer(serializers.ModelSerializer):
 
 
 class PhoneNumberSerialzier(serializers.ModelSerializer):
-    amount = serializers.DecimalField(max_digits=10,
-                                      decimal_places=2,
-                                      write_only=True)
+    amount = serializers.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        write_only=True,
+        validators=[MinValueValidator(limit_value=0.01)])
 
     class Meta:
         model = PhoneNumber
