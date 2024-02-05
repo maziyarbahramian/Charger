@@ -21,7 +21,7 @@ class CreateCreditRequestViewSet(generics.GenericAPIView):
         service = RequestService()
         if serializer.is_valid(raise_exception=True):
             valid_data = serializer.validated_data
-            seller_id = valid_data['seller_id']
+            seller_id = request.user.id
             amount = valid_data['amount']
 
             credit_request = service.create_credit_request(
