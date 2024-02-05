@@ -115,3 +115,4 @@ class Transaction(models.Model):
         choices=Type.choices
     )
     detail = models.TextField()
+    transaction_time = models.DateTimeField(auto_now_add=True)

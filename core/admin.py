@@ -54,7 +54,8 @@ class ChargeRequestAdmin(admin.ModelAdmin):
 
 class TransactionAdmin(admin.ModelAdmin):
     list_display = ['seller', 'amount', 'credit_before_transaction',
-                    'credit_after_transaction', 'type', 'detail']
+                    'credit_after_transaction', 'type', 'detail',
+                    'transaction_time']
 
 
 admin.site.register(models.Seller, SellerAdmin)
