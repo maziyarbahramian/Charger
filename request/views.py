@@ -61,10 +61,23 @@ class CreditRequestViewSet(mixins.RetrieveModelMixin,
     authentication_classes = [TokenAuthentication]
 
     def get_queryset(self):
-        if not self.request.user.is_staff:
-            return CreditRequest.objects.filter(seller=self.request.user)
-        else:
-            return self.queryset
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return CreditRequest.objects.filter(seller=self.request.user)
+
+
+class TransactionViewSet(mixins.RetrieveModelMixin,
+                         mixins.ListModelMixin,
+                         viewsets.GenericViewSet):
+    serializer_class = serializers.TransactionSerializer
+    queryset = Transaction.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+
+    def get_queryset(self):
+        if self.request.user.is_staff:
+            return super().get_queryset()
+        return Transaction.objects.filter(seller=self.request.user)
 
 
 class ChargePhoneNumberViewSet(generics.GenericAPIView):

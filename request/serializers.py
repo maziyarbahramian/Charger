@@ -58,3 +58,10 @@ class CreditRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = CreditRequest
         fields = '__all__'
+
+
+class TransactionSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Transaction
+        fields = '__all__'

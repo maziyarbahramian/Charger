@@ -9,7 +9,8 @@ from core.models import (
     CreditRequest
 )
 
-def create_credit_request()
+def create_credit_request():
+    pass
 
 class CreditRequestTest(TestCase):
     pass
