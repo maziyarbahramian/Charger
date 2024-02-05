@@ -94,10 +94,11 @@ class ServiceTest(TransactionTestCase):
 
         self.seller.refresh_from_db()
         phone_number.refresh_from_db()
+        self.assertEqual(transaction.amount, -amount)
         self.assertEqual(self.seller.credit, Decimal('85.00'))
         self.assertEqual(phone_number.charge, Decimal('20.00'))
 
-    def test_charge_phone_number_success(self):
+    def test_charge_phone_number_failed(self):
         """Test charge a phone number failed because of insufficient credit"""
         phone = PhoneNumber.objects.create(
             number='+989114412191',

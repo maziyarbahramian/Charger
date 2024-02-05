@@ -45,7 +45,7 @@ class RequestService:
         """withdraw from seller credit."""
         return Transaction.objects.create(
             seller=seller,
-            amount=request.amount,
+            amount=-request.amount,
             credit_before_transaction=seller.credit,
             credit_after_transaction=seller.credit-request.amount,
             type=Transaction.Type.WITHDRAW,
