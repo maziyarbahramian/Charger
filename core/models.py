@@ -80,21 +80,11 @@ class CreditRequest(models.Model):
 
 class ChargeRequest(models.Model):
     """model for charge requests."""
-    class Status(models.TextChoices):
-        PENDING = ('Pending', 'Pending')
-        SUCCESS = ('Success', 'Success')
-        FAILED = ('Failed', 'Failed')
-
     seller = models.ForeignKey('seller', on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=20)
     amount = models.DecimalField(
         max_digits=10, decimal_places=2)
     request_time = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(
-        max_length=10,
-        choices=Status.choices,
-        default=Status.PENDING
-    )
 
 
 class Transaction(models.Model):
