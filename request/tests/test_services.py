@@ -57,7 +57,7 @@ class ServiceTest(TransactionTestCase):
         request = CreditRequest.objects.create(
             seller=self.seller,
             amount=Decimal('50.00'),
-            status=CreditRequest.Status.SUCCESS,
+            status=CreditRequest.Status.ACCEPTED,
         )
 
         with self.assertRaises(CreditRequest.AlreadyProcessedError):
@@ -75,7 +75,7 @@ class ServiceTest(TransactionTestCase):
         self.seller.refresh_from_db()
 
         self.assertEqual(self.seller.credit, Decimal('100.00'))
-        self.assertEqual(request.status, CreditRequest.Status.FAILED)
+        self.assertEqual(request.status, CreditRequest.Status.REJECTED)
 
     def test_charge_phone_number_success(self):
         """Test charge a phone number."""

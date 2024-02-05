@@ -59,8 +59,8 @@ class CreditRequest(models.Model):
     """model for credit requests."""
     class Status(models.TextChoices):
         PENDING = ('Pending', 'Pending')
-        SUCCESS = ('Success', 'Success')
-        FAILED = ('Failed', 'Failed')
+        ACCEPTED = ('Accepted', 'Accepted')
+        REJECTED = ('Rejected', 'Rejected')
 
     seller = models.ForeignKey('Seller', on_delete=models.CASCADE)
     amount = models.DecimalField(
