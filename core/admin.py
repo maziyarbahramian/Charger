@@ -43,6 +43,21 @@ class SellerAdmin(UserAdmin):
     )
 
 
+class CreditRequestAdmin(admin.ModelAdmin):
+    list_display = ['seller', 'amount', 'status', 'request_time']
+
+
+class ChargeRequestAdmin(admin.ModelAdmin):
+    list_display = ['seller', 'phone_number',
+                    'amount', 'request_time']
+
+
+class TransactionAdmin(admin.ModelAdmin):
+    list_display = ['seller', 'amount', 'credit_before_transaction',
+                    'credit_after_transaction', 'type', 'detail']
+
+
 admin.site.register(models.Seller, SellerAdmin)
-admin.site.register(models.CreditRequest)
-admin.site.register(models.ChargeRequest)
+admin.site.register(models.CreditRequest, CreditRequestAdmin)
+admin.site.register(models.ChargeRequest, ChargeRequestAdmin)
+admin.site.register(models.Transaction, TransactionAdmin)
