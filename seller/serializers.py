@@ -25,6 +25,14 @@ class SellerSerializer(serializers.ModelSerializer):
         return get_user_model().objects.create_user(**validated_data)
 
 
+class SellerDetailSerializer(serializers.ModelSerializer):
+    """Serializer for show detail of seller."""
+    class Meta:
+        model = get_user_model()
+        # fields = '__all__'
+        exclude = ['user_permissions', 'groups', 'password']
+
+
 class AuthTokenSerializer(serializers.Serializer):
     """Serializer for the seller auth token."""
     email = serializers.EmailField()
