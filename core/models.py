@@ -73,7 +73,7 @@ class CreditRequest(models.Model):
     )
 
     class AlreadyProcessedError(Exception):
-        def __init__(self, message="Request already processed to Success or Failed state."):
+        def __init__(self, message="This request has already been processed and cannot be accepted or rejected again."):
             self.message = message
             super().__init__(self.message)
 

@@ -42,6 +42,8 @@ class RequestService:
 
     def ـwithdraw(self, seller, request):
         """withdraw from seller credit."""
+        if request.seller.credit < request.amount:
+            raise Seller.InsufficientCreditError
         return Transaction.objects.create(
             seller=seller,
             amount=-request.amount,
@@ -88,9 +90,6 @@ class RequestService:
         with transaction.atomic():
             seller = Seller.objects.get_queryset() \
                 .filter(id=seller_id).select_for_update(nowait=True).get()
-
-            if seller.credit < amount:
-                raise Seller.InsufficientCreditError
 
             request = ChargeRequest.objects.create(
                 seller=seller,
