@@ -13,12 +13,15 @@ from core.models import (
 CREDIT_REQUEST_URL = reverse('request:credit-request')
 ACCEPT_CREDIT_REQUEST_URL = reverse('request:accept-credit-request')
 REJECT_CREDIT_REQUEST_URL = reverse('request:reject-credit-request')
+CHARGE_PHONE_NUMBER_URL = reverse('request:charge-phone-number')
 
 
 def create_seller(email='email@test.com',
                   password='test1234',
-                  is_staff=False):
-    seller = Seller.objects.create_user(email=email, password=password)
+                  is_staff=False,
+                  credit=Decimal('0')):
+    seller = Seller.objects.create_user(
+        email=email, password=password, credit=credit)
     seller.is_staff = is_staff
     return seller
 
@@ -145,3 +148,35 @@ class RejectCreditRequestApiTests(APITestCase):
         res = self.client.post(REJECT_CREDIT_REQUEST_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+
+
+class ChargePhoneNumberApiTests(APITestCase):
+    """Test charge a phone number."""
+
+    def setUp(self):
+        self.seller1 = create_seller()
+        self.seller2 = create_seller(
+            email='user2@gmail.com', credit=Decimal('500'))
+
+    def test_charge_phone_number_success(self):
+        """test charge a phone number successfull."""
+        payload = {
+            'phone_number': '+989123456789',
+            'amount': Decimal('5.5'),
+        }
+        self.client.force_authenticate(user=self.seller2)
+        res = self.client.post(CHARGE_PHONE_NUMBER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_charge_phone_number_insufficient_credit_error(self):
+        """test insufficient memory error returned 
+           when seller doen not have enough credit."""
+        payload = {
+            'phone_number': '+989123456789',
+            'amount': Decimal('5.5'),
+        }
+        self.client.force_authenticate(user=self.seller1)
+        res = self.client.post(CHARGE_PHONE_NUMBER_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_402_PAYMENT_REQUIRED)
