@@ -2,6 +2,8 @@ from django.urls import path, include
 from request import views
 from rest_framework.routers import DefaultRouter
 
+app_name = 'request'
+
 router = DefaultRouter()
 router.register('credit-request', views.CreditRequestViewSet)
 router.register('transaction', views.TransactionViewSet)
