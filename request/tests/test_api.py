@@ -11,7 +11,8 @@ from core.models import (
 )
 
 CREDIT_REQUEST_URL = reverse('request:credit-request')
-ACCOPT_CREDIT_REQUEST_URL = reverse('request:accept-credit-request')
+ACCEPT_CREDIT_REQUEST_URL = reverse('request:accept-credit-request')
+REJECT_CREDIT_REQUEST_URL = reverse('request:reject-credit-request')
 
 
 def create_seller(email='email@test.com',
@@ -85,7 +86,7 @@ class AcceptCreditRequestApiTests(APITestCase):
         """Test accept credit request using normal user failed."""
         self.client.force_authenticate(user=self.seller)
         payload = {'request_id': self.credit_request.id}
-        res = self.client.post(ACCOPT_CREDIT_REQUEST_URL, payload)
+        res = self.client.post(ACCEPT_CREDIT_REQUEST_URL, payload)
         self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
 
     def test_accept_credit_request_success(self):
@@ -93,7 +94,7 @@ class AcceptCreditRequestApiTests(APITestCase):
         self.client.force_authenticate(user=self.admin_seller)
         payload = {'request_id': self.credit_request.id}
 
-        res = self.client.post(ACCOPT_CREDIT_REQUEST_URL, payload)
+        res = self.client.post(ACCEPT_CREDIT_REQUEST_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
@@ -102,7 +103,45 @@ class AcceptCreditRequestApiTests(APITestCase):
         self.client.force_authenticate(user=self.admin_seller)
         payload = {'request_id': self.credit_request.id}
 
-        self.client.post(ACCOPT_CREDIT_REQUEST_URL, payload)
-        res = self.client.post(ACCOPT_CREDIT_REQUEST_URL, payload)
+        self.client.post(ACCEPT_CREDIT_REQUEST_URL, payload)
+        res = self.client.post(ACCEPT_CREDIT_REQUEST_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
+
+
+class RejectCreditRequestApiTests(APITestCase):
+    """Test reject credit request api."""
+
+    def setUp(self):
+        self.seller = create_seller()
+        self.admin_seller = create_seller(
+            email='admin@example.com',
+            is_staff=True)
+        self.credit_request = create_credit_request(
+            self.seller, Decimal('50.0'))
+
+    def test_reject_credit_request_failed(self):
+        """Test reject credit request using normal user failed."""
+        self.client.force_authenticate(user=self.seller)
+        payload = {'request_id': self.credit_request.id}
+        res = self.client.post(REJECT_CREDIT_REQUEST_URL, payload)
+        self.assertEqual(res.status_code, status.HTTP_403_FORBIDDEN)
+
+    def test_reject_credit_request_success(self):
+        """Test reject credit request success"""
+        self.client.force_authenticate(user=self.admin_seller)
+        payload = {'request_id': self.credit_request.id}
+
+        res = self.client.post(REJECT_CREDIT_REQUEST_URL, payload)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_reject_credit_request_twice_failed(self):
+        """Test can't accept a credit request twice."""
+        self.client.force_authenticate(user=self.admin_seller)
+        payload = {'request_id': self.credit_request.id}
+
+        self.client.post(REJECT_CREDIT_REQUEST_URL, payload)
+        res = self.client.post(REJECT_CREDIT_REQUEST_URL, payload)
 
         self.assertEqual(res.status_code, status.HTTP_409_CONFLICT)
