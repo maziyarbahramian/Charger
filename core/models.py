@@ -54,6 +54,9 @@ class Seller(AbstractBaseUser, PermissionsMixin):
             self.message = message
             super().__init__(self.message)
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class CreditRequest(models.Model):
     """model for credit requests."""
@@ -72,6 +75,14 @@ class CreditRequest(models.Model):
         default=Status.PENDING
     )
 
+    def __str__(self) -> str:
+        return (
+            f'Credit Request - Seller: {self.seller}, '
+            f'Amount: {self.amount}, '
+            f'Request Time: {self.request_time}, '
+            f'Status: {self.get_status_display()}'
+        )
+
     class AlreadyProcessedError(Exception):
         def __init__(self, message="This request has already been processed and cannot be accepted or rejected again."):
             self.message = message
@@ -85,6 +96,14 @@ class ChargeRequest(models.Model):
     amount = models.DecimalField(
         max_digits=10, decimal_places=2)
     request_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return (
+            f'Charge Request - Seller: {self.seller}, '
+            f'Phone Number: {self.phone_number}, '
+            f'Amount: {self.amount}, '
+            f'Request Time: {self.request_time}'
+        )
 
 
 class Transaction(models.Model):
@@ -106,3 +125,13 @@ class Transaction(models.Model):
     )
     detail = models.TextField()
     transaction_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return (
+            f'Transaction Type: {self.get_type_display()}, '
+            f'Amount: {self.amount}, '
+            f'Credit Before Transaction: {self.credit_before_transaction}, '
+            f'Credit After Transaction: {self.credit_after_transaction}, '
+            f'Detail: {self.detail}, '
+            f'Transaction Time: {self.transaction_time}'
+        )
