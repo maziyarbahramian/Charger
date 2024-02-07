@@ -64,10 +64,9 @@ class RequestService:
             request.status = CreditRequest.Status.ACCEPTED
             request.save()
             seller = Seller.objects.get_queryset() \
-                .filter(id=request.seller.id).select_for_update(nowait=True).get()
+                .filter(id=request.seller.id).select_for_update().get()
 
             transaction_obj = self.ـdeposit(seller, request)
-
             seller.credit += request.amount
             seller.save()
             return transaction_obj
@@ -76,7 +75,7 @@ class RequestService:
         """reject credit request"""
         with transaction.atomic():
             request = CreditRequest.objects.get_queryset() \
-                .filter(id=request_id).select_for_update(nowait=True).get()
+                .filter(id=request_id).select_for_update().get()
 
             if request.status != CreditRequest.Status.PENDING:
                 raise CreditRequest.AlreadyProcessedError
@@ -89,7 +88,7 @@ class RequestService:
         """Charge the specified phone number."""
         with transaction.atomic():
             seller = Seller.objects.get_queryset() \
-                .filter(id=seller_id).select_for_update(nowait=True).get()
+                .filter(id=seller_id).select_for_update().get()
 
             request = ChargeRequest.objects.create(
                 seller=seller,

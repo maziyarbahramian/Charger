@@ -1,7 +1,8 @@
 """
 Tests for request services.
 """
-from django.test import TransactionTestCase
+import threading
+from django.test import TransactionTestCase, TestCase
 from django.contrib.auth import get_user_model
 from request.services import RequestService
 from django.db import transaction
@@ -12,6 +13,23 @@ from core.models import (
     Seller,
     Transaction
 )
+from multiprocessing import Process
+
+
+def create_seller(email='email@test.com',
+                  password='test1234',
+                  is_staff=False,
+                  credit=Decimal('0')):
+    seller = get_user_model().objects.create_user(
+        email=email, password=password, credit=credit)
+    seller.is_staff = is_staff
+    return seller
+
+
+def create_credit_request(seller, amount):
+    return CreditRequest.objects.create(
+        seller=seller, amount=amount
+    )
 
 
 class ServiceTest(TransactionTestCase):
@@ -116,3 +134,35 @@ class ServiceTest(TransactionTestCase):
 
         self.seller.refresh_from_db()
         self.assertEqual(self.seller.credit, Decimal('100'))
+
+
+class AcceptCreditRequestParallelTestCase(TransactionTestCase):
+    def setUp(self):
+        self.seller = create_seller(credit=Decimal('100'))
+        self.requests = []
+        for _ in range(5):
+            self.requests.append(
+                create_credit_request(self.seller, Decimal(50))
+            )
+
+        self.service = RequestService()
+
+    def _accept_request(self, request_id):
+        r = CreditRequest.objects.all()
+        self.service.accept_credit_request(request_id)
+
+    def test_parallel_accept_credit_request(self):
+        threads = []
+        for r in self.requests:
+            thread = threading.Thread(
+                target=self._accept_request, args=(r.id,))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+
+        updated_seller = Seller.objects.get(id=self.seller.id)
+
+        expected_credit = Decimal('350')
+        self.assertEqual(updated_seller.credit, expected_credit)
