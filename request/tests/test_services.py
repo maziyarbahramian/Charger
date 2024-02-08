@@ -2,18 +2,15 @@
 Tests for request services.
 """
 import threading
-from django.test import TransactionTestCase, TestCase
+from django.test import TransactionTestCase
 from django.contrib.auth import get_user_model
 from request.services import RequestService
 from django.db import transaction
 from decimal import Decimal
 from core.models import (
     CreditRequest,
-    ChargeRequest,
     Seller,
-    Transaction
 )
-from multiprocessing import Process
 
 
 def create_seller(email='email@test.com',
@@ -136,7 +133,9 @@ class ServiceTest(TransactionTestCase):
         self.assertEqual(self.seller.credit, Decimal('100'))
 
 
-class AcceptCreditRequestParallelTestCase(TransactionTestCase):
+class ServiceParallelTest(TransactionTestCase):
+    """Test case for parallel execution of atomic funcions on service."""
+
     def setUp(self):
         self.seller = create_seller(credit=Decimal('100'))
         self.requests = []
@@ -147,22 +146,34 @@ class AcceptCreditRequestParallelTestCase(TransactionTestCase):
 
         self.service = RequestService()
 
-    def _accept_request(self, request_id):
-        r = CreditRequest.objects.all()
-        self.service.accept_credit_request(request_id)
-
     def test_parallel_accept_credit_request(self):
+        """Test the parallel acceptance of credit requests."""
         threads = []
-        for r in self.requests:
+        for request in self.requests:
             thread = threading.Thread(
-                target=self._accept_request, args=(r.id,))
+                target=self.service.accept_credit_request, args=(request.id,))
             thread.start()
             threads.append(thread)
 
         for thread in threads:
             thread.join()
 
-        updated_seller = Seller.objects.get(id=self.seller.id)
-
+        self.seller.refresh_from_db()
         expected_credit = Decimal('350')
-        self.assertEqual(updated_seller.credit, expected_credit)
+        self.assertEqual(self.seller.credit, expected_credit)
+
+    def test_parallel_reject_credit_request(self):
+        """Test the parallel rejection of credit requests."""
+        threads = []
+        for request in self.requests:
+            thread = threading.Thread(
+                target=self.service.reject_credit_request, args=(request.id,))
+            thread.start()
+            threads.append(thread)
+
+        for thread in threads:
+            thread.join()
+
+        expected_credit = self.seller.credit
+        self.seller.refresh_from_db()
+        self.assertEqual(self.seller.credit, expected_credit)
